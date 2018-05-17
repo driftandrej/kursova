@@ -1,0 +1,26 @@
+ME="data.ping"
+tmpfile="tmp.ping"
+[ -s $ME ] || for i in {0..254}; do echo 2; done >> $ME
+OLD=( $(cat $FILENAME) )
+> "$ME"
+> "$tmpfile"
+net="10.7.180."
+for i in {160..180}
+do
+IP="$net$i"
+ping -c1 $IP &>>/dev/null
+ch=$?
+if [ ${OLD[$i]} -ne $ch ]
+then
+echo -n $IP 
+if [ $ch -eq 0 ]
+then
+echo " - ON"
+else
+echo " - OFF"
+fi
+OLD[$i]=$ch
+fi
+done >> $tmpfile
+[ -s $tmpfile ] && < $tmpfile mutt -s "PING IP ADDRESSESS" driftandrejnexus@gmail.com
+for i in {0..254}; do echo ${OLD[$i]}; done >> $ME
